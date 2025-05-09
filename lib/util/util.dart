@@ -29,13 +29,14 @@ class Util {
   static Map<String, List<AppTaskModel>> transformTaskData(List<SalesforceTaskModel> tasks) {
     
     final Map<String, List<AppTaskModel>> groupedTasks = {
-      'yesterday': [],
       'today': [],
       'tomorrow': [],
+      'later': [],
     };
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
 
     for (final sfTask in tasks) {
 
@@ -43,14 +44,14 @@ class Util {
       final taskDateOnly = DateTime(taskDate.year, taskDate.month, taskDate.day); // Truncate to date only
       final appTask = AppTaskModel.fromSalesforceTask(sfTask);
 
-      if (taskDateOnly.isBefore(today)) {
-        groupedTasks['yesterday']!.add(appTask);
-      } 
-      else if (taskDateOnly.isAtSameMomentAs(today)) {
+      if (taskDateOnly.isAtSameMomentAs(today)) {
         groupedTasks['today']!.add(appTask);
       } 
-      else if (taskDateOnly.isAfter(today)) {
+      else if (taskDateOnly.isAtSameMomentAs(tomorrow)) {
         groupedTasks['tomorrow']!.add(appTask);
+      } 
+      else if (taskDateOnly.isAfter(tomorrow)) {
+        groupedTasks['later']!.add(appTask); // Assign tasks beyond tomorrow to "Later"
       }
     }
 

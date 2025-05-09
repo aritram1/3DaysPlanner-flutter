@@ -152,27 +152,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 return const Center(child: Text('No tasks available.'));
               }
 
-              // Get formatted dates for yesterday, today, and tomorrow
+              // Get formatted dates for today and tomorrow
               final today = DateTime.now();
-              final yesterday = today.subtract(const Duration(days: 1));
               final tomorrow = today.add(const Duration(days: 1));
 
               final todayFormatted = '${today.day} ${Util.getMonthName(today.month)} ${today.year}';
-              final yesterdayFormatted = '${yesterday.day} ${Util.getMonthName(yesterday.month)} ${yesterday.year}';
               final tomorrowFormatted = '${tomorrow.day} ${Util.getMonthName(tomorrow.month)} ${tomorrow.year}';
 
-              // Display tasks in sections for yesterday, today, and tomorrow
+              // Display tasks in sections for Today, Tomorrow, and Later
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TaskSectionWidget(
-                        title: 'Yesterday', // Yesterday's tasks
-                        date: yesterdayFormatted,
-                        tasks: data['yesterday'] ?? [],
-                      ),
                       TaskSectionWidget(
                         title: 'Today', // Today's tasks
                         date: todayFormatted,
@@ -182,6 +175,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         title: 'Tomorrow', // Tomorrow's tasks
                         date: tomorrowFormatted,
                         tasks: data['tomorrow'] ?? [],
+                      ),
+                      TaskSectionWidget(
+                        title: 'Later', // Tasks for later days
+                        date: 'Upcoming Days', // Generic label for "Later"
+                        tasks: data['later'] ?? [], // Use "later" key for tasks beyond tomorrow
                       ),
                     ],
                   ),
