@@ -42,16 +42,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
-# Flutter build outputs
-/build/
-/.dart_tool/
-/.packages
-.flutter-plugins
-.flutter-plugins-dependencies
-.generated/
-.melos_tool/
-
 # iOS
 ios/Flutter/Flutter.framework
 ios/Flutter/Flutter.podspec
@@ -61,6 +51,9 @@ ios/.symlinks/
 /ios/Runner.xcworkspace/
 ios/Podfile.lock
 
+# to be removed later
+ios/Runner/
+
 # Android
 /android/.gradle/
 /android/.idea/
@@ -69,13 +62,6 @@ android/.cxx/
 
 # VS Code
 .vscode/
-
-# IntelliJ / Android Studio
-*.iml
-.idea/
-*.ipr
-*.iws
-*.swp
 
 # macOS
 .DS_Store
