@@ -4,6 +4,7 @@ import 'package:threedaysplanner/model/app_task_model.dart';
 import 'package:threedaysplanner/model/sf_task_model.dart';
 import 'package:threedaysplanner/util/sf_util.dart';
 import 'package:threedaysplanner/util/util.dart';
+import 'package:threedaysplanner/widget/task_widget.dart';
 
 class TaskSectionWidget extends StatefulWidget {
   final String title;
@@ -81,11 +82,7 @@ class _TaskSectionWidgetState extends State<TaskSectionWidget> {
   }
 
   Future<bool> onTaskDelete(String taskId) async {
-    // AppTaskModel task = widget.tasks.firstWhere((task) => task.id == taskId);
-    // task.status = 'Completed'; // Update the status to "Completed"
-    // task.actualCompletionTime = DateTime.now().toIso8601String(); // Set the actual completion time
-    // SalesforceTaskModel sfTask = SalesforceTaskModel.fromAppTask(taskId);
-
+    
     final success = await SFUtil.deleteTask(taskId);
 
     if (success) {
@@ -145,98 +142,67 @@ class _TaskSectionWidgetState extends State<TaskSectionWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final tasks = widget.tasks; // Use the tasks directly from the widget
+    final tasks = widget.tasks;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(
-              widget.title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          Text(
+            widget.title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            widget.date,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            Util.getDayOfWeek(widget.date),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Util.isWeekend(widget.date) ? Colors.red : Colors.grey,
             ),
-            const SizedBox(width: 8),
-            Text(
-              widget.date, // Existing date text
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              Util.getDayOfWeek(widget.date), // Add the day of the week
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Util.isWeekend(widget.date) ? Colors.red : Colors.grey, // Red for weekends
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ...tasks.map((task) {
-          final isCompleted = completedTasks.contains(task.id);
-          final taskName = task.name; // Use the name directly from AppTaskModel
-          final taskTime = formatTime(task.tentativeCompletionTime); // Format the time
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+      ...tasks.map((task) {
+        final isCompleted = completedTasks.contains(task.id);
 
-          return Dismissible(
-            key: Key(task.id), // Unique key for each task
-            direction: DismissDirection.startToEnd, // Swipe from left to right
-            background: Container(
-              color: Colors.red, // Background color for the swipe action
-              alignment: Alignment.centerLeft, // Align the icon to the left
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Icon(Icons.delete, color: Colors.white), // Delete icon
-            ),
-            onDismissed: (direction) async {
+        return TaskWidget(
+          task: task,
+          isCompleted: isCompleted,
+          onCompletionChanged: (bool? value) async {
+            if (value == true) {
               setState(() {
-                widget.tasks.remove(task); // Remove the task from the list
+                completedTasks.add(task.id);
               });
-
-              // Optionally, delete the task from Salesforce or your backend
-              final success = await onTaskDelete(task.id);
-              if (success) {
-                print('Task deleted successfully.');
-              } else {
-                print('Failed to delete task.');
-              }
-            },
-            child: Card(
-              child: ListTile(
-                onTap: () {
-                  showEditTaskDialog(task); // Show the edit dialog on tap
-                },
-                title: Text(
-                  taskName,
-                  style: TextStyle(
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
-                  ),
-                ),
-                subtitle: Text(
-                  taskTime,
-                  style: TextStyle(
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
-                  ),
-                ),
-                trailing: Checkbox(
-                  value: isCompleted,
-                  onChanged: (bool? value) async {
-                    if (value == true) {
-                      setState(() {
-                        completedTasks.add(task.id);
-                      });
-                      await onTaskCompleted(task.id);
-                    } else {
-                      setState(() {
-                        completedTasks.remove(task.id);
-                      });
-                      await onTaskNotCompleted(task.id);
-                    }
-                  },
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
+              await onTaskCompleted(task.id);
+            } else {
+              setState(() {
+                completedTasks.remove(task.id);
+              });
+              await onTaskNotCompleted(task.id);
+            }
+          },
+          onEdit: () {
+            showEditTaskDialog(task);
+          },
+          onDelete: () async {
+            final success = await onTaskDelete(task.id);
+            if (success) {
+              setState(() {
+                widget.tasks.remove(task);
+              });
+            }
+            return success;
+          },
+        );
+      }).toList(),
+      const SizedBox(height: 16),
+    ],
+  );
+}
 }

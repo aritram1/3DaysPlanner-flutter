@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 
 class DataGenerator {
   static Future<Map<String, dynamic>> getMockTaskData({int count = 10}) async {
+    
     Future.delayed(const Duration(seconds: 1)); // Simulate API delay
 
     final now = DateTime.now();

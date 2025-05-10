@@ -33,7 +33,7 @@ class AppTaskModel {
       id: sfTask.id ?? '',
       name: sfTask.name ?? 'Unnamed Task',
       tentativeCompletionTime: sfTask.tentativeCompletionTime ?? 'No Tentative Time Provided',
-      actualCompletionTime: sfTask.actualCompletionTime ?? 'No Actual Time Provided',
+      actualCompletionTime: sfTask.actualCompletionTime ?? '',
       priority: sfTask.priority ?? 'Medium',
       category: sfTask.category ?? 'Work',
       reminderMapped: sfTask.reminderRequired?.toString() ?? 'false',

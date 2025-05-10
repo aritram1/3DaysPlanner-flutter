@@ -39,7 +39,9 @@ class SalesforceTaskModel {
       reminderRequired: map['Reminder_Required__c'] as bool?,
       status: map['Status__c'] as String?,
       missed: map['Missed__c'] as bool?,
-      numberOfTimesMissed: int.tryParse(map['Number_Of_Times_Missed__c']?.toString() ?? '0'),
+      numberOfTimesMissed: (map['Number_Of_Times_Missed__c'] is int)
+          ? map['Number_Of_Times_Missed__c'] as int
+          : (map['Number_Of_Times_Missed__c'] as double?)?.toInt() ?? 0,
       snoozed: map['Snoozed__c'] as bool?,
     );
   }
