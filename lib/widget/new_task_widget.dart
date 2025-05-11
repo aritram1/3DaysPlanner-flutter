@@ -15,28 +15,54 @@ class NewTaskWidget extends StatefulWidget {
 
 class _NewTaskWidgetState extends State<NewTaskWidget> {
   String selectedDateOption = 'Today';
+  // TBC 
+  // DateTime customDate = DateTime.now().copyWith(hour: 10, minute: 30);
   DateTime? customDate;
+
   String taskName = '';
   String priority = 'Medium';
   String category = 'Work';
   bool reminderRequired = false;
+  
+  String? tentativeCompletionTime;
 
   Future<void> createTask() async {
 
-    String tentativeCompletionTime = '';
+    // Check requred fields are filled in, else early return the function
+    if (taskName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a task name.')));
+      return;
+    }
+    if (selectedDateOption == 'Custom' && customDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a valid date.')));
+      return;
+    }
+
+    //String tentativeCompletionTime = '';
+    const int hour = 10; // Set the hour to 10 AM
+    const int minutes = 30; // Set the minute to 30
+
     if (selectedDateOption == 'Today') {
-      tentativeCompletionTime = DateTime.now().toIso8601String();
+      // tentativeCompletionTime = DateTime.now().copyWith(hour: hour, minute: minute).toIso8601String();
+      tentativeCompletionTime = DateTime.now()
+                                  .add(const Duration(hours: hour, minutes: minutes))
+                                  .toIso8601String();
     } 
     else if (selectedDateOption == 'Tomorrow') {
-      tentativeCompletionTime = DateTime.now().add(const Duration(days: 1)).toIso8601String();
+      tentativeCompletionTime = DateTime.now()
+                    .add(const Duration(days: 1, hours: hour, minutes: minutes))
+                    .toIso8601String();
     } 
     else {
-      tentativeCompletionTime = customDate?.toIso8601String() ?? '';
+      tentativeCompletionTime = customDate!
+                    // .copyWith(hour: hour, minute: minutes)
+                    .add(const Duration(hours: hour, minutes: minutes))
+                    .toIso8601String();
     }
     
     Map<String, dynamic> taskMap = {
       'Name': taskName,
-      'Tentative_Completion_Time__c': Util.convertISTToGMT(tentativeCompletionTime), // Convert IST to GMT
+      'Tentative_Completion_Time__c': Util.convertISTToGMT(tentativeCompletionTime!), // Convert IST to GMT
       'Priority__c': priority,
       'Category__c': category,
       'Reminder_Required__c': reminderRequired,
