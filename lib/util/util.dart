@@ -122,8 +122,31 @@ class Util {
     try {
       final dateTime = DateTime.parse(isoTime);
       return DateFormat.jm().format(dateTime);
-    } catch (e) {
+    } 
+    catch (e) {
       return 'Invalid Time';
+    }
+  }
+
+  /// Converts a GMT DateTime string to IST DateTime string.
+  static String convertGMTToIST(String gmtTime) {
+    try {
+      final gmtDateTime = DateTime.parse(gmtTime).toUtc(); // Parse as UTC
+      final istDateTime = gmtDateTime.toLocal(); // Convert to local time (IST if the device is in IST)
+      return DateFormat('yyyy-MM-ddTHH:mm:ss').format(istDateTime); // Format as ISO string
+    } catch (e) {
+      return gmtTime; // Return original time if parsing fails
+    }
+  }
+
+  /// Converts an IST DateTime string to GMT DateTime string.
+  static String convertISTToGMT(String istTime) {
+    try {
+      final istDateTime = DateTime.parse(istTime).toLocal(); // Parse as local time
+      final gmtDateTime = istDateTime.toUtc(); // Convert to UTC
+      return DateFormat('yyyy-MM-ddTHH:mm:ss').format(gmtDateTime); // Format as ISO string
+    } catch (e) {
+      return istTime; // Return original time if parsing fails
     }
   }
 

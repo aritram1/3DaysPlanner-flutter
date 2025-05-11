@@ -32,8 +32,12 @@ class SalesforceTaskModel {
     return SalesforceTaskModel(
       id: map['Id'] as String?,
       name: map['Name'] as String?,
-      tentativeCompletionTime: map['Tentative_Completion_Time__c'] as String?,
-      actualCompletionTime: map['Actual_Completion_Time__c'] as String?,
+      tentativeCompletionTime: map['Tentative_Completion_Time__c'] != null
+          ? Util.convertGMTToIST(map['Tentative_Completion_Time__c'] as String)
+          : null,
+      actualCompletionTime: map['Actual_Completion_Time__c'] != null
+          ? Util.convertGMTToIST(map['Actual_Completion_Time__c'] as String)
+          : null,
       priority: map['Priority__c'] as String?,
       category: map['Category__c'] as String?,
       reminderRequired: map['Reminder_Required__c'] as bool?,
@@ -51,8 +55,12 @@ class SalesforceTaskModel {
     return {
       'Id': id,
       'Name': name,
-      'Tentative_Completion_Time__c': tentativeCompletionTime,
-      'Actual_Completion_Time__c': actualCompletionTime,
+      'Tentative_Completion_Time__c': tentativeCompletionTime != null
+          ? Util.convertISTToGMT(tentativeCompletionTime!)
+          : null,
+      'Actual_Completion_Time__c': actualCompletionTime != null
+          ? Util.convertISTToGMT(actualCompletionTime!)
+          : null,
       'Priority__c': priority,
       'Category__c': category,
       'Reminder_Required__c': reminderRequired,

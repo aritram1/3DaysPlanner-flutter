@@ -36,7 +36,7 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
     
     Map<String, dynamic> taskMap = {
       'Name': taskName,
-      'Tentative_Completion_Time__c': tentativeCompletionTime,
+      'Tentative_Completion_Time__c': Util.convertISTToGMT(tentativeCompletionTime), // Convert IST to GMT
       'Priority__c': priority,
       'Category__c': category,
       'Reminder_Required__c': reminderRequired,
