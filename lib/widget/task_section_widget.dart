@@ -106,15 +106,56 @@ class _TaskSectionWidgetState extends State<TaskSectionWidget> {
 
   void showEditTaskDialog(AppTaskModel task) {
     final TextEditingController taskNameController = TextEditingController(text: task.name);
+    String selectedPriority = task.priority; // Track the selected priority
+
+    // Get the other two priorities
+    final List<String> priorities = ['High', 'Medium', 'Low'];
+    final List<String> otherPriorities = priorities.where((p) => p != task.priority).toList();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Edit Task'),
-          content: TextField(
-            controller: taskNameController,
-            decoration: const InputDecoration(labelText: 'Task Name'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setDialogState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start, // Align content to the left
+                children: [
+                  // Task Name Field
+                  TextField(
+                    controller: taskNameController,
+                    decoration: const InputDecoration(labelText: 'Task Name'),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Priority Section
+                  const Text('Priority'),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start, // Align items to the start
+                    children: otherPriorities.map((priority) {
+                      return Row(
+                        children: [
+                          Radio<String>(
+                            value: priority,
+                            groupValue: selectedPriority,
+                            onChanged: (value) {
+                              setDialogState(() {
+                                selectedPriority = value!;
+                              });
+                            },
+                          ),
+                          Text(priority), // Display the other priority options
+                          const SizedBox(width: 16), // Add spacing between choices
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ],
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -126,8 +167,9 @@ class _TaskSectionWidgetState extends State<TaskSectionWidget> {
             TextButton(
               onPressed: () async {
                 setState(() {
-                  // Update the task name
+                  // Update the task name and priority
                   task.name = taskNameController.text;
+                  task.priority = selectedPriority;
                 });
                 await onTaskUpdated(task); // Call the async method
                 Navigator.of(context).pop(); // Close the dialog after saving
