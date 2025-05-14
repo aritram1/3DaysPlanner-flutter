@@ -173,6 +173,13 @@ class _TaskSectionWidgetState extends State<TaskSectionWidget> {
 
         return TaskWidget(
           task: task,
+          onUndo: (deletedTask) {
+            setState(() {
+              // Use the stored original index to re-add the task
+              widget.tasks.insert(deletedTask.originalIndex ?? 0, deletedTask);
+              completedTasks.remove(deletedTask.id); // Remove from completed tasks if necessary
+            });
+          },
           isCompleted: isCompleted,
           onCompletionChanged: (bool? value) async {
             if (value == true) {
@@ -191,11 +198,14 @@ class _TaskSectionWidgetState extends State<TaskSectionWidget> {
             showEditTaskDialog(task);
           },
           onDelete: () async {
+            final originalIndex = widget.tasks.indexOf(task); // Get the original index
             final success = await onTaskDelete(task.id);
             if (success) {
               setState(() {
-                widget.tasks.remove(task);
+                widget.tasks.removeAt(originalIndex); // Remove the task from its original position
               });
+              // Attach the original index to the task for undo purposes
+              task.originalIndex = originalIndex;
             }
             return success;
           },
