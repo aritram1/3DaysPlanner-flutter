@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 
 class DataGenerator {
   static Future<Map<String, dynamic>> getMockTaskData({int count = 10}) async {
+    
     Future.delayed(const Duration(seconds: 1)); // Simulate API delay
 
     final now = DateTime.now();
@@ -9,7 +10,7 @@ class DataGenerator {
     final today = DateFormat('yyyy-MM-dd').format(now);
     final tomorrow = DateFormat('yyyy-MM-dd').format(now.add(const Duration(days: 1)));
 
-    final response = {
+    final mockResponse = {
       "totalSize": 6,
       "done": true,
       "records": [
@@ -122,6 +123,6 @@ class DataGenerator {
         }
       ]
     };
-    return Future.value(response);
+    return Future.value(mockResponse);
   }
 }

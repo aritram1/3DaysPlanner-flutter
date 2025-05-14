@@ -4,8 +4,6 @@ import 'package:threedaysplanner/model/sf_task_model.dart';
 import 'package:threedaysplanner/util/util.dart';
 import 'package:threedaysplanner/widget/new_task_widget.dart';
 import 'package:threedaysplanner/widget/task_section_widget.dart';
-import 'package:threedaysplanner/util/auth.dart'; // Import for access token
-import 'package:threedaysplanner/util/app_constants.dart'; // Import for instance URL
 import 'package:threedaysplanner/util/secure_file_manager.dart'; // Import for SecureFileManager
 
 class MyHomePage extends StatefulWidget {
@@ -152,27 +150,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 return const Center(child: Text('No tasks available.'));
               }
 
-              // Get formatted dates for yesterday, today, and tomorrow
+              // Get formatted dates for today, tomorrow, and day after tomorrow
               final today = DateTime.now();
-              final yesterday = today.subtract(const Duration(days: 1));
               final tomorrow = today.add(const Duration(days: 1));
+              final dayAfterTomorrow = today.add(const Duration(days: 2));
 
               final todayFormatted = '${today.day} ${Util.getMonthName(today.month)} ${today.year}';
-              final yesterdayFormatted = '${yesterday.day} ${Util.getMonthName(yesterday.month)} ${yesterday.year}';
               final tomorrowFormatted = '${tomorrow.day} ${Util.getMonthName(tomorrow.month)} ${tomorrow.year}';
+              final dayAfterTomorrowFormatted = '${dayAfterTomorrow.day} ${Util.getMonthName(dayAfterTomorrow.month)} ${dayAfterTomorrow.year}';
 
-              // Display tasks in sections for yesterday, today, and tomorrow
+              // Display tasks in sections for Today, Tomorrow, Day After Tomorrow, and Later
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TaskSectionWidget(
-                        title: 'Yesterday', // Yesterday's tasks
-                        date: yesterdayFormatted,
-                        tasks: data['yesterday'] ?? [],
-                      ),
                       TaskSectionWidget(
                         title: 'Today', // Today's tasks
                         date: todayFormatted,
@@ -182,6 +175,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         title: 'Tomorrow', // Tomorrow's tasks
                         date: tomorrowFormatted,
                         tasks: data['tomorrow'] ?? [],
+                      ),
+                      TaskSectionWidget(
+                        title: 'Day After Tomorrow', // Day After Tomorrow's tasks
+                        date: dayAfterTomorrowFormatted,
+                        tasks: data['dayAfterTomorrow'] ?? [],
+                      ),
+                      TaskSectionWidget(
+                        title: 'Later', // Tasks for later days
+                        date: 'Upcoming Days', // Generic label for "Later"
+                        tasks: data['later'] ?? [], // Use "later" key for tasks beyond day after tomorrow
                       ),
                     ],
                   ),

@@ -1,4 +1,5 @@
 import 'package:threedaysplanner/model/app_task_model.dart';
+import 'package:threedaysplanner/util/util.dart';
 
 class SalesforceTaskModel {
   final String? id;
@@ -32,14 +33,20 @@ class SalesforceTaskModel {
     return SalesforceTaskModel(
       id: map['Id'] as String?,
       name: map['Name'] as String?,
-      tentativeCompletionTime: map['Tentative_Completion_Time__c'] as String?,
-      actualCompletionTime: map['Actual_Completion_Time__c'] as String?,
+      tentativeCompletionTime: map['Tentative_Completion_Time__c'] != null
+          ? Util.convertGMTToIST(map['Tentative_Completion_Time__c'] as String)
+          : null,
+      actualCompletionTime: map['Actual_Completion_Time__c'] != null
+          ? Util.convertGMTToIST(map['Actual_Completion_Time__c'] as String)
+          : null,
       priority: map['Priority__c'] as String?,
       category: map['Category__c'] as String?,
       reminderRequired: map['Reminder_Required__c'] as bool?,
       status: map['Status__c'] as String?,
       missed: map['Missed__c'] as bool?,
-      numberOfTimesMissed: int.tryParse(map['Number_Of_Times_Missed__c']?.toString() ?? '0'),
+      numberOfTimesMissed: (map['Number_Of_Times_Missed__c'] is int)
+          ? map['Number_Of_Times_Missed__c'] as int
+          : (map['Number_Of_Times_Missed__c'] as double?)?.toInt() ?? 0,
       snoozed: map['Snoozed__c'] as bool?,
     );
   }
@@ -49,8 +56,12 @@ class SalesforceTaskModel {
     return {
       'Id': id,
       'Name': name,
-      'Tentative_Completion_Time__c': tentativeCompletionTime,
-      'Actual_Completion_Time__c': actualCompletionTime,
+      'Tentative_Completion_Time__c': tentativeCompletionTime != null
+          ? Util.convertISTToGMT(tentativeCompletionTime!)
+          : null,
+      'Actual_Completion_Time__c': actualCompletionTime != null
+          ? Util.convertISTToGMT(actualCompletionTime!)
+          : null,
       'Priority__c': priority,
       'Category__c': category,
       'Reminder_Required__c': reminderRequired,
