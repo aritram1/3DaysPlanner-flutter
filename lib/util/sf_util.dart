@@ -25,9 +25,10 @@ class SFUtil {
     Map<String, dynamic> response = {};
     final url = Uri.parse('${AppConstants.instanceUrl}/services/data/v52.0/query');
     const query = '''SELECT Id, Name, Tentative_Completion_Time__c, Actual_Completion_Time__c,
-                      Priority__c, Category__c, Reminder_Required__c, 
-                      Status__c, Missed__c, Number_Of_Times_Missed__c, Snoozed__c 
-                      FROM Work__c''';
+              Priority__c, Category__c, Reminder_Required__c, 
+              Status__c, Missed__c, Number_Of_Times_Missed__c, Snoozed__c 
+              FROM Work__c
+              ORDER BY Tentative_Completion_Time__c ASC, Priority__c ASC''';
 
     // const query = '''SELECT Id, Name, Tentative_Completion_Time__c, Actual_Completion_Time__c,
     //                   Priority__c, Category__c, Reminder_Required__c, 
