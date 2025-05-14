@@ -43,21 +43,31 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
     const int minutes = 30; // Set the minute to 30
 
     if (selectedDateOption == 'Today') {
-      // tentativeCompletionTime = DateTime.now().copyWith(hour: hour, minute: minute).toIso8601String();
-      tentativeCompletionTime = DateTime.now()
-                                  .add(const Duration(hours: hour, minutes: minutes))
-                                  .toIso8601String();
+      tentativeCompletionTime = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+        0,
+        0,
+      ).add(const Duration(hours: hour, minutes: minutes)).toIso8601String();
     } 
     else if (selectedDateOption == 'Tomorrow') {
-      tentativeCompletionTime = DateTime.now()
-                    .add(const Duration(days: 1, hours: hour, minutes: minutes))
-                    .toIso8601String();
+      tentativeCompletionTime = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day + 1,
+        0,
+        0,
+      ).add(const Duration(hours: hour, minutes: minutes)).toIso8601String();
     } 
     else {
-      tentativeCompletionTime = customDate!
-                    // .copyWith(hour: hour, minute: minutes)
-                    .add(const Duration(hours: hour, minutes: minutes))
-                    .toIso8601String();
+      tentativeCompletionTime = DateTime(
+        customDate!.year,
+        customDate!.month,
+        customDate!.day,
+        0,
+        0,
+      ).add(const Duration(hours: hour, minutes: minutes)).toIso8601String();
     }
     
     Map<String, dynamic> taskMap = {
