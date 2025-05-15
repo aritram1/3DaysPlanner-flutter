@@ -23,29 +23,34 @@ class Util {
     return Future.value(tasks);
   }
 
-  /// Transforms a list of SalesforceTaskModel into a map grouped by 'today', 'tomorrow', and 'later'.
+  /// Transforms a list of SalesforceTaskModel into a map grouped by 'today', 'tomorrow', 'dayAfterTomorrow', and 'later'.
   static Map<String, List<AppTaskModel>> transformTaskData(List<SalesforceTaskModel> tasks) {
     final Map<String, List<AppTaskModel>> groupedTasks = {
       'today': [],
       'tomorrow': [],
+      'dayAfterTomorrow': [],
       'later': [],
     };
 
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final tomorrow = today.add(const Duration(days: 1));
+    final today = DateTime(now.year, now.month, now.day); // Only the date part
+    final tomorrow = today.add(const Duration(days: 1)); // Tomorrow's date
+    final dayAfterTomorrow = tomorrow.add(const Duration(days: 1)); // Day after tomorrow's date
 
     for (final sfTask in tasks) {
-      final taskDate = DateTime.parse(sfTask.tentativeCompletionTime!).toLocal(); // Convert to local timezone
-      final taskDateOnly = DateTime(taskDate.year, taskDate.month, taskDate.day); // Truncate to date only
+      final taskDate = DateTime.parse(sfTask.tentativeCompletionTime!).toUtc(); // Parse as UTC
+      final taskDateOnly = DateTime(taskDate.year, taskDate.month, taskDate.day); // Extract only the date part
+
       final appTask = AppTaskModel.fromSalesforceTask(sfTask);
 
-      if (taskDateOnly.isAtSameMomentAs(today)) {
+      if (taskDateOnly == today) {
         groupedTasks['today']!.add(appTask);
-      } else if (taskDateOnly.isAtSameMomentAs(tomorrow)) {
+      } else if (taskDateOnly == tomorrow) {
         groupedTasks['tomorrow']!.add(appTask);
-      } else if (taskDateOnly.isAfter(tomorrow)) {
-        groupedTasks['later']!.add(appTask); // Assign tasks beyond tomorrow to "Later"
+      } else if (taskDateOnly == dayAfterTomorrow) {
+        groupedTasks['dayAfterTomorrow']!.add(appTask);
+      } else if (taskDateOnly.isAfter(dayAfterTomorrow)) {
+        groupedTasks['later']!.add(appTask); // Assign tasks beyond day after tomorrow to "Later"
       }
     }
 
