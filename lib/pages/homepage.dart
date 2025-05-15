@@ -31,8 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // Fetch raw data from Salesforce and convert to List of `SalesforceTaskModel`
     List<SalesforceTaskModel> rawData = await Util.getTaskData();
 
-    // Transform the `SalesforceTaskModel` list to day wise `AppTaskModel` list 
-    // Organize as per `yesterday`, `today` and `tomorrow`
+    // Transform the list of `SalesforceTaskModel` to list of `AppTaskModel` 
+    // Organize as per `today` and `tomorrow`, `day after tomorrow` and `later
     Map<String, List<AppTaskModel>> transformedData = Util.transformTaskData(rawData);
     
     return transformedData;
@@ -48,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Show dialog with Salesforce info
   void showSalesforceInfoDialog() async {
+    
     // Fetch authentication info from SecureFileManager
     final authInfo = await SecureFileManager.getAuthInfo();
 
@@ -75,11 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisSize: MainAxisSize.min, // Ensures the column takes up minimum space
             crossAxisAlignment: CrossAxisAlignment.start, // Aligns text to the left
             children: [
-              Text('Instance URL: $instanceUrl'),
+              SelectableText('Instance URL: $instanceUrl'),
               const SizedBox(height: 8),
-              Text('Access Token: $accessToken'),
+              SelectableText('Access Token: $accessToken'),
               const SizedBox(height: 8),
-              Text('Issued At: $issuedAtFormatted'),
+              SelectableText('Issued At: $issuedAtFormatted'),
             ],
           ),
           actions: [

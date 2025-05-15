@@ -4,7 +4,7 @@ import 'package:threedaysplanner/model/sf_task_model.dart';
 import 'package:threedaysplanner/util/app_constants.dart'; // Import app constants
 import 'package:threedaysplanner/util/auth.dart';
 import 'package:threedaysplanner/util/secure_file_manager.dart'; // Import SalesforceAuth for access token
-import 'package:threedaysplanner/model/app_task_model.dart';
+// import 'package:threedaysplanner/model/app_task_model.dart';
 
 class SFUtil {
 
@@ -24,21 +24,13 @@ class SFUtil {
 
     Map<String, dynamic> response = {};
     final url = Uri.parse('${AppConstants.instanceUrl}/services/data/v52.0/query');
-    const query = '''SELECT Id, Name, Tentative_Completion_Time__c, Actual_Completion_Time__c,
+    const query = '''
+              SELECT Id, Name, Tentative_Completion_Time__c, Actual_Completion_Time__c,
               Priority__c, Category__c, Reminder_Required__c, 
               Status__c, Missed__c, Number_Of_Times_Missed__c, Snoozed__c 
               FROM Work__c
-              ORDER BY Tentative_Completion_Time__c ASC, Priority__c ASC''';
-
-    // const query = '''SELECT Id, Name, Tentative_Completion_Time__c, Actual_Completion_Time__c,
-    //                   Priority__c, Category__c, Reminder_Required__c, 
-    //                   Status__c, Missed__c, Number_Of_Times_Missed__c, Snoozed__c 
-    //                   FROM Work__c
-    //                   WHERE Tentative_Completion_Time__c = YESTERDAY 
-    //                     OR Tentative_Completion_Time__c = TODAY 
-    //                     OR Tentative_Completion_Time__c = TOMORROW
-    //                   ORDER BY Tentative_Completion_Time__c ASC
-    //               ''';
+              ORDER BY Tentative_Completion_Time__c ASC, Priority__c ASC
+              ''';
 
     final sfResponse = await http.get(
       url.replace(queryParameters: {'q': query}),
@@ -60,37 +52,8 @@ class SFUtil {
     }
   }
 
-  /// Method 2: Save Task Data to Work__c Object
-  // static Future<bool> saveTaskData(Map<String, dynamic> task) async {
-  //   if (SalesforceAuth.accessToken == null) {
-  //     // Attempt to authenticate if the access token is null
-  //     final authenticated = await SalesforceAuth.authenticate();
-  //     if (!authenticated) {
-  //       throw Exception('Authentication failed. Unable to save task data.');
-  //     }
-  //   }
-
-  //   final url = Uri.parse('${AppConstants.instanceUrl}/services/data/v52.0/sobjects/Work__c');
-  //   final response = await http.post(
-  //     url,
-  //     headers: {
-  //       'Authorization': 'Bearer ${SalesforceAuth.accessToken}',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: jsonEncode(task),
-  //   );
-
-  //   if (response.statusCode == 201) {
-  //     print('Task saved successfully: ${response.body}');
-  //     return true;
-  //   } else {
-  //     print('Failed to save task: ${response.body}');
-  //     return false;
-  //   }
-  // }
-
-  /// Method 2: Save Task Data to Work__c Object
-  static Future<Map<String, dynamic>> saveTaskToSalesforce(Map<String, dynamic> task) async {  
+  // Method 2: Save Task Data to Work__c Object
+  static Future<Map<String, dynamic>> createTask(Map<String, dynamic> task) async {  
     
     Map<String, dynamic> returnValue = {};
     

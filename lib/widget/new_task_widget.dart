@@ -38,6 +38,15 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
       return;
     }
 
+    // Clip task name if it exceeds 255 characters
+    int taskNameLength = taskName.length;
+    if (taskName.length > 255) {
+      taskName = taskName.substring(0, 255);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Name contains $taskNameLength characters, now clipped to 255 characters.')),
+      );
+    }
+
     //String tentativeCompletionTime = '';
     const int hour = 10; // Set the hour to 10 AM
     const int minutes = 30; // Set the minute to 30
@@ -83,7 +92,7 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
     
 
     // Call the async method in util.dart
-    Map<String, dynamic> result = await SFUtil.saveTaskToSalesforce(taskMap);
+    Map<String, dynamic> result = await SFUtil.createTask(taskMap);
 
     // Print the result to the console
     print('result inside saveTask=>${(result)}');
@@ -158,7 +167,7 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
                 TextField(
                   decoration: const InputDecoration(
                     labelText: 'Enter Date (MM/DD)',
-                    helperText: 'E.g., 05/10',
+                    helperText: 'e.g., 05/10',
                   ),
                   keyboardType: TextInputType.datetime,
                   onChanged: (value) {
@@ -170,7 +179,9 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
                       setState(() {
                         customDate = DateTime(year, month, day);
                       });
-                    } catch (_) {
+                    } 
+                    catch (error) {
+                      print('error inside catch block of providing custom date => $error');
                       customDate = null;
                     }
                   },

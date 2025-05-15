@@ -1,18 +1,20 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:threedaysplanner/data/data.dart';
+import 'package:threedaysplanner/data/MockDataGenerator.dart';
 import 'package:threedaysplanner/model/app_task_model.dart';
 import 'package:threedaysplanner/model/sf_task_model.dart';
+import 'package:threedaysplanner/util/app_constants.dart';
 import 'package:threedaysplanner/util/sf_util.dart';
 
 class Util {
-  /// Fetches task data from Salesforce and returns a list of SalesforceTaskModel.
-  static Future<List<SalesforceTaskModel>> getTaskData() async {
-    await Future.delayed(const Duration(seconds: 2)); // Simulate API delay
 
-    // Actual code
-    Map<String, dynamic> response = await SFUtil.getTaskData();
+  // Fetches task data from Salesforce and returns a list of SalesforceTaskModel.
+  static Future<List<SalesforceTaskModel>> getTaskData() async {
+    
+    // Get Task Data from Salesforce or mock it depending on the mock constant
+    Map<String, dynamic> response = (AppConstants.mock == false) 
+                                      ? await SFUtil.getTaskData() 
+                                      : await MockDataGenerator.getMockTaskData();
 
     List<SalesforceTaskModel> tasks = [];
     List<dynamic> data = response['records'] as List<dynamic>;
