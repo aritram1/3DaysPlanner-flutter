@@ -26,6 +26,8 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
   
   String? tentativeCompletionTime;
 
+  final TextEditingController customDateController = TextEditingController();
+
   Future<void> createTask() async {
 
     // Check requred fields are filled in, else early return the function
@@ -157,6 +159,12 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
                     onChanged: (value) {
                       setState(() {
                         selectedDateOption = value!;
+                        // Set customDate to today + 7 days if not already set
+                        if (customDate == null) {
+                          final now = DateTime.now();
+                          customDate = DateTime(now.year, now.month, now.day).add(const Duration(days: 7));
+                          customDateController.text = '${customDate!.month.toString().padLeft(2, '0')}/${customDate!.day.toString().padLeft(2, '0')}';
+                        }
                       });
                     },
                   ),
@@ -165,12 +173,13 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
               ),
               if (selectedDateOption == 'Custom')
                 TextField(
+                  controller: customDateController,
                   decoration: const InputDecoration(
                     labelText: 'Enter Date (MM/DD)',
-                    helperText: 'e.g., 05/10',
+                    // helperText: 'e.g., 05/10',
                   ),
                   keyboardType: TextInputType.datetime,
-                  onChanged: (value) {
+                  onChanged: (value) { 
                     try {
                       final parts = value.split('/');
                       final month = int.parse(parts[0]);
