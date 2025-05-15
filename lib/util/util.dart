@@ -1,18 +1,20 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:threedaysplanner/data/data.dart';
+import 'package:threedaysplanner/data/MockDataGenerator.dart';
 import 'package:threedaysplanner/model/app_task_model.dart';
 import 'package:threedaysplanner/model/sf_task_model.dart';
+import 'package:threedaysplanner/util/app_constants.dart';
 import 'package:threedaysplanner/util/sf_util.dart';
 
 class Util {
-  /// Fetches task data from Salesforce and returns a list of SalesforceTaskModel.
-  static Future<List<SalesforceTaskModel>> getTaskData() async {
-    await Future.delayed(const Duration(seconds: 2)); // Simulate API delay
 
-    // Actual code
-    Map<String, dynamic> response = await SFUtil.getTaskData();
+  // Fetches task data from Salesforce and returns a list of SalesforceTaskModel.
+  static Future<List<SalesforceTaskModel>> getTaskData() async {
+    
+    // Get Task Data from Salesforce or mock it depending on the mock constant
+    Map<String, dynamic> response = (AppConstants.mock == false) 
+                                      ? await SFUtil.getTaskData() 
+                                      : await MockDataGenerator.getMockTaskData();
 
     List<SalesforceTaskModel> tasks = [];
     List<dynamic> data = response['records'] as List<dynamic>;
@@ -23,29 +25,34 @@ class Util {
     return Future.value(tasks);
   }
 
-  /// Transforms a list of SalesforceTaskModel into a map grouped by 'today', 'tomorrow', and 'later'.
+  /// Transforms a list of SalesforceTaskModel into a map grouped by 'today', 'tomorrow', 'dayAfterTomorrow', and 'later'.
   static Map<String, List<AppTaskModel>> transformTaskData(List<SalesforceTaskModel> tasks) {
     final Map<String, List<AppTaskModel>> groupedTasks = {
       'today': [],
       'tomorrow': [],
+      'dayAfterTomorrow': [],
       'later': [],
     };
 
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final tomorrow = today.add(const Duration(days: 1));
+    final today = DateTime(now.year, now.month, now.day); // Only the date part
+    final tomorrow = today.add(const Duration(days: 1)); // Tomorrow's date
+    final dayAfterTomorrow = tomorrow.add(const Duration(days: 1)); // Day after tomorrow's date
 
     for (final sfTask in tasks) {
-      final taskDate = DateTime.parse(sfTask.tentativeCompletionTime!).toLocal(); // Convert to local timezone
-      final taskDateOnly = DateTime(taskDate.year, taskDate.month, taskDate.day); // Truncate to date only
+      final taskDate = DateTime.parse(sfTask.tentativeCompletionTime!).toUtc(); // Parse as UTC
+      final taskDateOnly = DateTime(taskDate.year, taskDate.month, taskDate.day); // Extract only the date part
+
       final appTask = AppTaskModel.fromSalesforceTask(sfTask);
 
-      if (taskDateOnly.isAtSameMomentAs(today)) {
+      if (taskDateOnly == today) {
         groupedTasks['today']!.add(appTask);
-      } else if (taskDateOnly.isAtSameMomentAs(tomorrow)) {
+      } else if (taskDateOnly == tomorrow) {
         groupedTasks['tomorrow']!.add(appTask);
-      } else if (taskDateOnly.isAfter(tomorrow)) {
-        groupedTasks['later']!.add(appTask); // Assign tasks beyond tomorrow to "Later"
+      } else if (taskDateOnly == dayAfterTomorrow) {
+        groupedTasks['dayAfterTomorrow']!.add(appTask);
+      } else if (taskDateOnly.isAfter(dayAfterTomorrow)) {
+        groupedTasks['later']!.add(appTask); // Assign tasks beyond day after tomorrow to "Later"
       }
     }
 

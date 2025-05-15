@@ -8,6 +8,7 @@ class TaskWidget extends StatelessWidget {
   final Function(bool?) onCompletionChanged;
   final Function() onEdit;
   final Future<bool> Function() onDelete;
+  final Function(AppTaskModel) onUndo;
 
   const TaskWidget({
     super.key,
@@ -16,6 +17,7 @@ class TaskWidget extends StatelessWidget {
     required this.onCompletionChanged,
     required this.onEdit,
     required this.onDelete,
+    required this.onUndo,
   });
 
   @override
@@ -27,23 +29,46 @@ class TaskWidget extends StatelessWidget {
 
     return Dismissible(
       key: Key(task.id),
-      direction: DismissDirection.startToEnd,
-      background: Container(
-        color: Colors.red,
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Icon(Icons.delete, color: Colors.white),
+      direction: DismissDirection.endToStart, // Change to left swipe
+      background: ClipRRect(
+        borderRadius: BorderRadius.circular(12), // Match the card's border radius
+        child: Container(
+          color: Colors.red,
+          alignment: Alignment.centerRight, // Align delete icon to the right
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: const Icon(Icons.delete, color: Colors.white),
+        ),
       ),
       onDismissed: (direction) async {
+        final deletedTask = task; // Temporarily store the deleted task
         final success = await onDelete();
-        if (!success) {
-          // Optionally, show a snackbar or undo action if deletion fails
+
+        if (success) {
+          // Show a SnackBar with an "Undo" action
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Task deleted'),
+              action: SnackBarAction(
+                label: 'Undo',
+                onPressed: () {
+                  // Restore the task if "Undo" is clicked
+                  onUndo(deletedTask);
+                },
+              ),
+              duration: const Duration(seconds: 5), // Duration before the SnackBar disappears
+            ),
+          );
+        } else {
+          // Show an error SnackBar if deletion fails
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Failed to delete task.')),
           );
         }
       },
       child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Ensure the card has the same border radius
+        ),
         color: Util.getBackgroundColorBasedOnPriority(task.priority), // Set background color based on priority
         child: ListTile(
           onTap: onEdit,

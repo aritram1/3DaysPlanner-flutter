@@ -12,6 +12,7 @@ class AppTaskModel {
   final bool missed;
   final int numberOfTimesMissed;
   final bool snoozed;
+  int? originalIndex; // Add this field to store the original index
 
   AppTaskModel({
     required this.id,
@@ -25,6 +26,7 @@ class AppTaskModel {
     required this.missed,
     required this.numberOfTimesMissed,
     required this.snoozed,
+    this.originalIndex, // Add this field to the constructor
   });
 
   // Factory method to create an AppTaskModel from a SalesforceTaskModel
@@ -41,6 +43,7 @@ class AppTaskModel {
       missed: sfTask.missed ?? false,
       numberOfTimesMissed: sfTask.numberOfTimesMissed ?? 0,
       snoozed: sfTask.snoozed ?? false,
+      originalIndex: null, // Initialize originalIndex as null
     );
   }
 
@@ -58,6 +61,7 @@ class AppTaskModel {
       'missed': missed,
       'numberOfTimesMissed': numberOfTimesMissed,
       'snoozed': snoozed,
+      'originalIndex': originalIndex, // Add originalIndex to the map
     };
   }
 }
